@@ -3,6 +3,7 @@ const router = express.Router();
 
 const {
     getAllProducts,
+    getSingleProduct,
     addProduct
 } = require("../controllers/productController");
 
@@ -13,6 +14,7 @@ router.get("/", getAllProducts);
 
 // Admin
 router.post("/", upload.single("image"), addProduct);
+router.get("/:id", getSingleProduct);
 
 module.exports = router;
 

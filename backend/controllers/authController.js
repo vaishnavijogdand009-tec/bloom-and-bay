@@ -69,7 +69,7 @@ const loginUser = async (req, res) => {
             });
         }
 
-        // Find user by email
+        // Find user
         const user = await User.findOne({ email });
 
         if (!user) {
@@ -78,21 +78,34 @@ const loginUser = async (req, res) => {
                 message: "Invalid Email or Password"
             });
         }
-        
 
         // Compare password
-       const isMatch = await bcrypt.compare(password, user.password);
+        const isMatch = await bcrypt.compare(password, user.password);
 
-           if (!isMatch) {
+        if (!isMatch) {
             return res.status(401).json({
                 success: false,
                 message: "Invalid Email or Password"
-           });
+            });
         }
 
+        // Generate JWT Token
+        const token = jwt.sign(
+            {
+                id: user._id,
+                role: user.role
+            },
+            process.env.JWT_SECRET,
+            {
+                expiresIn: "7d"
+            }
+        );
+
+        // Send Response
         res.status(200).json({
             success: true,
-            message: "User Found"
+            message: "Login Successful",
+            token
         });
 
     } catch (error) {
@@ -103,19 +116,6 @@ const loginUser = async (req, res) => {
         });
 
     }
-    
-    // Generate JWT Token
-const token = jwt.sign(
-    {
-        id: user._id,
-        role: user.role
-    },
-    process.env.JWT_SECRET,
-    {
-        expiresIn: "7d"
-    }
-);
-
 };
 
 
